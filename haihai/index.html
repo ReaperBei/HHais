@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<style>
+    /* 摄像头调焦距*/
+    /*调焦区*/
+    .adjustFocus {
+        display: inline-block;
+        position: absolute;
+        /*左边摄像头方向控制 宽度 25%*/
+        top: 30%;
+        left: 10%;
+        width: 45%;
+        height: 20%;
+        background-color: saddlebrown;
+    }
+
+    .adjustFocus .focus_title {
+        color: white;
+        font-size: 15px;
+        margin: 3% auto;
+        text-align: center;
+        /*background-color: seagreen;*/
+    }
+
+    .progress_back_div {
+        height: 30px;
+        width: 100%;
+        margin-top: 13%;
+        /*background-color: salmon;*/
+        display: inline-block;
+        text-align: center;
+    }
+
+    .progress_back_div img {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    /*进度条*/
+    .progress {
+        margin-left: -5%;
+        margin-right: 2%;
+        display: inline-block;
+        position: relative;
+        width: 65%;
+    }
+
+    .progress_bg {
+        height: 5px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        overflow: hidden;
+        background-color: #f2f2f2;
+    }
+
+    .progress_bar {
+        background: #85B839;
+        width: 0;
+        height: 5px;
+        border-radius: 5px;
+        position: relative;
+        right: 0;
+    }
+
+    /*进度条圆点按钮*/
+    .progress_btn {
+        width: 16px;
+        height: 16px;
+        border-radius: 8px;
+        background: #fff;
+        position: absolute;
+        left: 0px;
+        margin-left: -8px;
+        top: -5px;
+        cursor: pointer;
+        border: 2px #bbbbbb solid;
+        box-sizing: border-box;
+    }
+
+    .reduce_img,
+    .add_img {
+        cursor: pointer;
+        position: relative;
+        top: -45%;
+    }
+</style>
+
+<body>
+    <div class="adjustFocus">
+        <div class="focus_title">变焦控制</div>
+        <div class="progress_back_div">
+            <img class="reduce_img" src="img/focus_reduce.png" />
+            　 <div class="progress">
+                    <div class="progress_bg">
+                        <div class="progress_bar"></div>
+                    </div>
+                    <div class="progress_btn"></div>
+                    <div class="text">0%</div>
+                    </div>
+            <img class="add_img" src="img/focus_add.png" />
+        </div>
+    </div>
+</body>
+<script src="js/jquery-2.1.0.js"></script>
+<script>
+    // 焦距
+    $(function () {
+        $('.progress_bar').width(20)
+        $('.progress_btn').css('left', '20px');
+        var tag = false, ox = 0, left = 0, bgleft = 0;
+        $('.progress_btn').mousedown(function (e) {
+            ox = e.pageX - left+20;
+            tag = true;
+        });
+        $(document).mouseup(function () {
+            tag = false;
+        });
+        var progress_width = $('.progress').width();
+        $('.progress').mousemove(function (e) {//鼠标移动 + 图片变焦
+            if (tag) {
+                left = e.pageX - ox;
+                if (left <= 0) {
+                    left = 0;
+                } else if (left > progress_width) {
+                    left = progress_width;
+                }
+                $('.progress_btn').css('left', left);
+                $('.progress_bar').width(left);
+                $('.text').html(parseInt((left / progress_width) * 100) + '%');
+            }
+            console.log('left  ======= ' + left);
+        });
+        $('.progress_bg').click(function (e) {//鼠标点击 + 图片变焦
+            if (!tag) {
+                bgleft = $('.progress_bg').offset().left;
+                left = e.pageX - bgleft;
+                if (left <= 0) {
+                    left = 0;
+                } else if (left > progress_width) {
+                    left = progress_width;
+                }
+                $('.progress_btn').css('left', left);
+                $('.progress_bar').animate({ width: left }, progress_width);
+                $('.text').html(parseInt((left / progress_width) * 100) + '%');
+            }
+        });
+    });
+    $(function () {
+        //减焦距 一次减 5 个百分比
+        $(".reduce_img").click(function (e) {
+            var left = $('.progress_bar').width();
+            var progress_width = $('.progress').width();
+            left = left - progress_width * 0.05;
+            if (left <= 0) {
+                left = 0;
+            }
+            $('.progress_btn').css('left', left);
+            $('.progress_bar').animate({ width: left }, progress_width);
+            $('.text').html(parseInt((left / progress_width) * 100) + '%');
+        });
+        //加焦距
+        $(".add_img").click(function (e) {
+            var left = $('.progress_bar').width();
+            var progress_width = $('.progress').width();
+            left = left + progress_width * 0.05;
+            if (left >= progress_width) {
+                left = progress_width;
+            }
+            $('.progress_btn').css('left', left);
+            $('.progress_bar').animate({ width: left }, progress_width);
+            $('.text').html(parseInt((left / progress_width) * 100) + '%');
+        });
+
+    })
+</script>
+
+</html>
